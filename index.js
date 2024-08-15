@@ -21,5 +21,8 @@ express().listen(3000, () => {
       setTimeout(async () => { await absen('keluar');}, 100);
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
+    cron.schedule("0 * * * *", async () => {
+      console.log("[INFO] - Log Process", new Date().toLocaleString()); 
+    });
   }main();
 })
