@@ -27,10 +27,13 @@ async function executeAbsenMasuk(username, password) {
   try {
     console.log(`[INFO] - Start Absen Masuk - ${username}`, new Date().toLocaleString());
     const browser = await puppeteer.launch({ headless: true });
+    const context = browser.defaultBrowserContext();
+    await context.overridePermissions('https://eoffice.ilcs.co.id', ['geolocation']);
+  
     const page = await browser.newPage();
     const timeout = 500000;
     page.setDefaultTimeout(timeout);
-
+    await page.setGeolocation({ latitude: -6.149751593365433, longitude: 106.88824671984855 });
     {
         const targetPage = page;
         await targetPage.setViewport({
@@ -195,9 +198,12 @@ async function executeAbsenPulang(username, password) {
     console.log(`[INFO] - Start Absen Pulang - ${username}`, new Date().toLocaleString());
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    const context = browser.defaultBrowserContext();
+    await context.overridePermissions('https://eoffice.ilcs.co.id', ['geolocation']);
+
     const timeout = 500000;
     page.setDefaultTimeout(timeout);
-
+    await page.setGeolocation({ latitude: -6.149751593365433, longitude: 106.88824671984855 });
     {
         const targetPage = page;
         await targetPage.setViewport({

@@ -17,8 +17,8 @@ express().listen(3000, () => {
   
     cron.schedule("0 20 * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
-      // const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
-      setTimeout(async () => { await absen('keluar');}, 100);
+      const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
+      setTimeout(async () => { await absen('keluar');}, delay);
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
     cron.schedule("0 * * * *", async () => {
