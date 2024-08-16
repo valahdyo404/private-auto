@@ -26,8 +26,8 @@ app.listen(3000, () => {
     await db.initialize();
     cron.schedule("*/5 * * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
-      const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
-      setTimeout(async () => { await absen('masuk');}, delay);
+      // const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
+      setTimeout(async () => { await absen('masuk');}, 100);
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
   
