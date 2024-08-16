@@ -40,7 +40,7 @@ app.listen(3000, () => {
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
     cron.schedule("*/5 * * * *", async () => {
-      await absen('keluar');
+      // await absen('keluar');
       console.log("[INFO] - Log Process", new Date().toLocaleString()); 
     });
   }main();

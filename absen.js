@@ -387,7 +387,7 @@ async function executeAbsenPulang(username, password, activity) {
               },
             });
     }
-    console.log("[INFO] - MODAL MASUK")
+    console.log("[INFO] - MODAL PULANG")
     console.log("[INFO] - WAITING 50s", new Date().toLocaleString())
     await new Promise(res => setTimeout(res, 50000))
     console.log("[INFO] - DONE WAITING 50s", new Date().toLocaleString())
