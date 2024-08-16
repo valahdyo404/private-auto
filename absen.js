@@ -4,12 +4,19 @@ const db = require('./config/db');
 async function absen(type='masuk') {
   try {
     const users = await getDataUser();
+    
     for (let index = 0; index < users.length; index++) {
       const user = users[index];
-      if (type == 'masuk') await executeAbsenMasuk(user.username, user.password);
-      else if (type =='keluar') await executeAbsenPulang(user.username, user.password);
+      if (type == 'masuk') {
+        await executeAbsenMasuk(user.username, user.password);
+      } else if (type =='keluar') {
+          const activities = await getAktivitas();
+          const activity = randomActivities(activities)
+          await executeAbsenPulang(user.username, user.password, activity);
+      }
       await new Promise(res => setTimeout(res, 4000));
     }
+    
   } catch (error) {
     console.log(error);
   }
@@ -211,9 +218,9 @@ async function executeAbsenMasuk(username, password) {
   }
 }
 
-async function executeAbsenPulang(username, password) {
+async function executeAbsenPulang(username, password, activity) {
   try {
-    console.log(`[INFO] - Start Absen Pulang - ${username}`, new Date().toLocaleString());
+    console.log(`[INFO] - Start Absen Pulang - ${username}, activity: ${activity}`, new Date().toLocaleString());
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -351,7 +358,7 @@ async function executeAbsenPulang(username, password) {
             targetPage.locator('::-p-xpath(//*[@id=\\"aktivitas\\"])')
         ])
             .setTimeout(timeout)
-            .fill('Fixing bugs, define development detail');
+            .fill(activity);
     }
     {
         const targetPage = page;
@@ -417,6 +424,23 @@ async function executeAbsenPulang(username, password) {
   }
 }
 
+function randomActivities(activities =[]) {
+  try {
+    const getRandomNumber = Math.floor(Math.random()*activities?.length);
+    return activities[getRandomNumber]
+  } catch (error) {
+    console.log(error) 
+  }
+}
+
+async function getAktivitas() {
+  try {
+    const { rows } = await db.query(`SELECT activity_name FROM activities`);
+    return rows.map(row => row.activity_name)
+  } catch (error) {
+    console.log(error) 
+  }
+}
 module.exports = {absen}
 
 
