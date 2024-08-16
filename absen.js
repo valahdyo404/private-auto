@@ -26,7 +26,19 @@ async function getDataUser() {
 async function executeAbsenMasuk(username, password) {
   try {
     console.log(`[INFO] - Start Absen Masuk - ${username}`, new Date().toLocaleString());
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
+    });
     const context = browser.defaultBrowserContext();
     await context.overridePermissions('https://eoffice.ilcs.co.id', ['geolocation']);
   
@@ -196,7 +208,19 @@ async function executeAbsenMasuk(username, password) {
 async function executeAbsenPulang(username, password) {
   try {
     console.log(`[INFO] - Start Absen Pulang - ${username}`, new Date().toLocaleString());
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
+    });
     const page = await browser.newPage();
     const context = browser.defaultBrowserContext();
     await context.overridePermissions('https://eoffice.ilcs.co.id', ['geolocation']);
