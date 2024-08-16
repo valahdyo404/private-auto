@@ -37,7 +37,7 @@ app.listen(3000, () => {
       setTimeout(async () => { await absen('keluar');}, delay);
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
-    cron.schedule("* * * * *", async () => {
+    cron.schedule("*/5 * * * *", async () => {
       console.log("[INFO] - Log Process", new Date().toLocaleString()); 
     });
   }main();
