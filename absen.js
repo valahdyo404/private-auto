@@ -441,6 +441,6 @@ async function getAktivitas() {
     console.log(error) 
   }
 }
-module.exports = {absen}
+module.exports = { absen }
 
 

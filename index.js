@@ -27,17 +27,20 @@ app.listen(3000, () => {
     cron.schedule("0 0 * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
       const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
-      setTimeout(async () => { await absen('masuk');}, delay);
+      await new Promise(res => setTimeout(res, delay))
+      await absen('masuk');
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
   
     cron.schedule("0 13 * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
       const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
-      setTimeout(async () => { await absen('keluar');}, delay);
+      await new Promise(res => setTimeout(res, delay))
+      await absen('keluar');
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
     cron.schedule("*/5 * * * *", async () => {
+      await absen('keluar');
       console.log("[INFO] - Log Process", new Date().toLocaleString()); 
     });
   }main();
