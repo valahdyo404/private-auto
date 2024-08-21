@@ -3,16 +3,23 @@ const db = require('./config/db');
 
 async function absen(type='masuk') {
   try {
-    const users = await getDataUser();
-    
+    const users = await getDataUser(type);
+    const today = new Date();
+    let isWeekend = false;
+    let latar = 'WFO';
+    if(today.getDay() == 6 || today.getDay() == 0) {
+      isWeekend = true;
+      latar = 'WFS';
+    }
     for (let index = 0; index < users.length; index++) {
+      if (!users[index]?.is_weekend && isWeekend) continue
       const user = users[index];
       if (type == 'masuk') {
-        await executeAbsenMasuk(user.username, user.password);
+        await executeAbsenMasuk(user.username, user.password, user.location, latar);
       } else if (type =='keluar') {
           const activities = await getAktivitas();
           const activity = randomActivities(activities)
-          await executeAbsenPulang(user.username, user.password, activity);
+          await executeAbsenPulang(user.username, user.password, activity, user.location, latar);
       }
       await new Promise(res => setTimeout(res, 4000));
     }
@@ -21,16 +28,19 @@ async function absen(type='masuk') {
     console.log(error);
   }
 }
-async function getDataUser() {
+async function getDataUser(type) {
   try {
-    const { rows } = await db.query('SELECT username, password FROM users');
+    let where = ''
+    if (type == 'masuk') where += `AND IS_MASUK = '1'`;
+    else if (type == 'keluar') where += `AND IS_KELUAR = '1'`;
+    const { rows } = await db.query(`SELECT username, password, location, is_weekend FROM users WHERE 1=1 ${where}`);
     return rows
   } catch (error) {
     console.log(error)
   }
 }
 
-async function executeAbsenMasuk(username, password) {
+async function executeAbsenMasuk(username, password, location, latar) {
   try {
     console.log(`[INFO] - Start Absen Masuk - ${username}`, new Date().toLocaleString());
     const browser = await puppeteer.launch({
@@ -58,7 +68,10 @@ async function executeAbsenMasuk(username, password) {
     const page = await browser.newPage();
     const timeout = 500000;
     page.setDefaultTimeout(timeout);
-    await page.setGeolocation({ latitude: -6.149751593365433, longitude: 106.88824671984855 });
+    const latitude = location?.split(';')[0] || '-6.149751593365433';  
+    const longitude = location?.split(';')[1] || '106.88824671984855';
+    await page.setGeolocation({ latitude: Number(latitude), longitude: Number(longitude) });
+    // await page.setGeolocation({ latitude: -6.149751593365433, longitude: 106.88824671984855 });
     {
         const targetPage = page;
         await targetPage.setViewport({
@@ -145,9 +158,9 @@ async function executeAbsenMasuk(username, password) {
             targetPage.locator('::-p-xpath(//*[@id=\\"via\\"])')
         ])
             .setTimeout(timeout)
-            .fill('WFS');
+            .fill(latar);
     }
-    console.log("[INFO] - WORK FROM SITE")
+    console.log(`[INFO] - ${latar}`)
     console.log("[INFO] - WAITING MODAL MASUK 20s", new Date().toLocaleString())
     await new Promise(res => setTimeout(res, 20000))
     console.log("[INFO] - DONE MODAL MASUK", new Date().toLocaleString())
@@ -218,7 +231,7 @@ async function executeAbsenMasuk(username, password) {
   }
 }
 
-async function executeAbsenPulang(username, password, activity) {
+async function executeAbsenPulang(username, password, activity, location, latar) {
   try {
     console.log(`[INFO] - Start Absen Pulang - ${username}, activity: ${activity}`, new Date().toLocaleString());
     const browser = await puppeteer.launch({
@@ -246,7 +259,10 @@ async function executeAbsenPulang(username, password, activity) {
 
     const timeout = 500000;
     page.setDefaultTimeout(timeout);
-    await page.setGeolocation({ latitude: -6.149751593365433, longitude: 106.88824671984855 });
+    const latitude = location?.split(';')[0] || '-6.149751593365433';  
+    const longitude = location?.split(';')[1] || '106.88824671984855';
+    await page.setGeolocation({ latitude: Number(latitude), longitude: Number(longitude) });
+    // await page.setGeolocation({ latitude: -6.149751593365433, longitude: 106.88824671984855 });
     {
         const targetPage = page;
         await targetPage.setViewport({
@@ -333,9 +349,9 @@ async function executeAbsenPulang(username, password, activity) {
             targetPage.locator('::-p-xpath(//*[@id=\\"via_out\\"])')
         ])
             .setTimeout(timeout)
-            .fill('WFS');
+            .fill(latar);
     }
-    console.log("[INFO] - WORK FROM SITE")
+    console.log(`[INFO] - ${latar}`)
     console.log("[INFO] - WAITING MODAL PULANG 20s", new Date().toLocaleString())
     await new Promise(res => setTimeout(res, 20000))
     console.log("[INFO] - DONE MODAL PULANG", new Date().toLocaleString())

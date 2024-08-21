@@ -24,7 +24,7 @@ app.listen(3000, () => {
 	});
   async function main() {
     await db.initialize();
-    cron.schedule("0 0 * * *", async () => {
+    cron.schedule("0 1 * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
       const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
       await new Promise(res => setTimeout(res, delay))
@@ -32,15 +32,15 @@ app.listen(3000, () => {
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
   
-    cron.schedule("0 13 * * *", async () => {
+    cron.schedule("30 11 * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
       const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
       await new Promise(res => setTimeout(res, delay))
       await absen('keluar');
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
-    cron.schedule("*/5 * * * *", async () => {
-      // await absen('keluar');
+    cron.schedule("* * * * *", async () => {
+      // await absen('masuk');
       console.log("[INFO] - Log Process", new Date().toLocaleString()); 
     });
   }main();
