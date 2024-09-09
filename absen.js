@@ -90,6 +90,20 @@ async function executeAbsenMasuk(username, password, location, latar) {
         await Promise.all(promises);
     }
     {
+      const targetPage = page;
+      await puppeteer.Locator.race([
+          targetPage.locator('::-p-xpath(//*[@id=\\"modal-banner\\"]/div/div/div[1]/button/span)'),
+          targetPage.locator('::-p-text(×)')
+      ])
+          .setTimeout(timeout)
+          .click({
+            offset: {
+              x: 7.1796875,
+              y: 13,
+            },
+          });
+    }
+    {
         const targetPage = page;
         await puppeteer.Locator.race([
             targetPage.locator('::-p-xpath(/html/body/div/div[2]/div/form/div[1]/input)')
@@ -279,6 +293,20 @@ async function executeAbsenPulang(username, password, activity, location, latar)
         startWaitingForEvents();
         await targetPage.goto('https://eoffice.ilcs.co.id/p2b/login');
         await Promise.all(promises);
+    }
+    {
+      const targetPage = page;
+      await puppeteer.Locator.race([
+          targetPage.locator('::-p-xpath(//*[@id=\\"modal-banner\\"]/div/div/div[1]/button/span)'),
+          targetPage.locator('::-p-text(×)')
+      ])
+          .setTimeout(timeout)
+          .click({
+            offset: {
+              x: 7.1796875,
+              y: 13,
+            },
+          });
     }
     {
         const targetPage = page;
