@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const db = require('./config/db');
+const { default: axios } = require('axios');
 
 async function absen(type='masuk') {
   try {
@@ -15,11 +16,11 @@ async function absen(type='masuk') {
       if (!users[index]?.is_weekend && isWeekend) continue
       const user = users[index];
       if (type == 'masuk') {
-        await executeAbsenMasuk(user.username, user.password, user.location, latar);
+        await absenMasuk(user.username, user.password, user.location, latar);
       } else if (type =='keluar') {
           const activities = await getAktivitas();
           const activity = randomActivities(activities)
-          await executeAbsenPulang(user.username, user.password, activity, user.location, latar);
+          await absenPulang(user.username, user.password, activity, user.location, latar);
       }
       await new Promise(res => setTimeout(res, 4000));
     }
@@ -35,6 +36,100 @@ async function getDataUser(type) {
     else if (type == 'keluar') where += `AND IS_KELUAR = '1'`;
     const { rows } = await db.query(`SELECT username, password, location, is_weekend FROM users WHERE 1=1 ${where}`);
     return rows
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function absenMasuk(username, password, location, latar) {
+  try {
+    const latitude = location?.split(';')[0] || '-6.149751593365433';  
+    const longitude = location?.split(';')[1] || '106.88824671984855';
+    const alamat = location?.split(';')[2] || 'Jalan+Mitra+Sunter+Boulevard%2C+RW+11%2C+Sunter+Jaya%2C+Tanjung+Priok%2C+North+Jakarta%2C+Special+capital+Region+of+Jakarta%2C+Java%2C+14350%2C+Indonesia';
+    const params = new URLSearchParams()
+    params.append('username', username);
+    params.append('password', password);
+
+    const configLogin = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Origin': 'https://eoffice.ilcs.co.id',
+        'Referer': 'https://eoffice.ilcs.co.id/p2b/login',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
+      },
+      // withCredentials: true
+    }
+    const url = "https://eoffice.ilcs.co.id/p2b/login/do_login"
+    const login = await axios.post(url, params, configLogin)
+
+    let mappingCookie = login.headers["set-cookie"][0]?.split(';')[0]
+    mappingCookie += '; ' + login.headers["set-cookie"][1]?.split(';')[0]
+    mappingCookie += '; ' + login.headers["set-cookie"][2]?.split(';')[0]
+    console.log('Login success')
+
+    const urlabsen = "https://eoffice.ilcs.co.id/p2b/absensi/absen_masuk"
+    const data = `via=${latar}&kondisi=Sehat&lokasi=${latitude}%2C${longitude}&alamat=${alamat}&state=&provinsi=Special+capital+Region+of+Jakarta&keterangan=`
+    const configAbsen = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Origin': 'https://eoffice.ilcs.co.id',
+        'Referer': 'https://eoffice.ilcs.co.id/p2b/absensi/online',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+        'Cookie': mappingCookie,
+      },
+      withCredentials: true
+    }
+    const result = await axios.post(urlabsen, data, configAbsen)
+    console.log(result.data, "Absen masuk result")
+    console.log('Absen masuk success')
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function absenPulang(username, password, activity, location, latar) {
+  try {
+    const latitude = location?.split(';')[0] || '-6.149751593365433';  
+    const longitude = location?.split(';')[1] || '106.88824671984855';
+    const alamat = location?.split(';')[2] || 'Jalan+Mitra+Sunter+Boulevard%2C+RW+11%2C+Sunter+Jaya%2C+Tanjung+Priok%2C+North+Jakarta%2C+Special+capital+Region+of+Jakarta%2C+Java%2C+14350%2C+Indonesia';
+    const params = new URLSearchParams()
+    params.append('username', username);
+    params.append('password', password);
+
+    const configLogin = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Origin': 'https://eoffice.ilcs.co.id',
+        'Referer': 'https://eoffice.ilcs.co.id/p2b/login',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
+      },
+      // withCredentials: true
+    }
+    const url = "https://eoffice.ilcs.co.id/p2b/login/do_login"
+    const login = await axios.post(url, params, configLogin)
+
+    let mappingCookie = login.headers["set-cookie"][0]?.split(';')[0]
+    mappingCookie += '; ' + login.headers["set-cookie"][1]?.split(';')[0]
+    mappingCookie += '; ' + login.headers["set-cookie"][2]?.split(';')[0]
+    console.log('Login success')
+
+    const urlabsen = "https://eoffice.ilcs.co.id/p2b/absensi/absen_pulang"
+    const data = `via=${latar}&kondisi=Sehat&lokasi=${latitude}%2C${longitude}&alamat=${alamat}&state=&provinsi=Special+capital+Region+of+Jakarta&keterangan=&aktivitas=${activity}`
+    const configAbsen = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Origin': 'https://eoffice.ilcs.co.id',
+        'Referer': 'https://eoffice.ilcs.co.id/p2b/absensi/online',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+        'Cookie': mappingCookie,
+      },
+      withCredentials: true
+    }
+    const result = await axios.post(urlabsen, data, configAbsen)
+    console.log(result.data, "Absen pulang result")
+    console.log('Absen pulang sukses')
+
   } catch (error) {
     console.log(error)
   }
