@@ -18,7 +18,9 @@ async function absen(type='masuk') {
       if (type == 'masuk') {
         await absenMasuk(user.username, user.password, user.location, latar);
       } else if (type =='keluar') {
-          const activities = await getAktivitas();
+          const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
+          await new Promise(res => setTimeout(res, delay + (user.plus_minute_keluar * 60 * 1000)));
+          const activities = await getAktivitas(user.username);
           const activity = randomActivities(activities)
           await absenPulang(user.username, user.password, activity, user.location, latar);
       }
@@ -34,7 +36,7 @@ async function getDataUser(type) {
     let where = ''
     if (type == 'masuk') where += `AND IS_MASUK = '1'`;
     else if (type == 'keluar') where += `AND IS_KELUAR = '1'`;
-    const { rows } = await db.query(`SELECT username, password, location, is_weekend FROM users WHERE 1=1 ${where}`);
+    const { rows } = await db.query(`SELECT username, password, location, is_weekend, plus_minute_keluar FROM users WHERE 1=1 ${where}`);
     return rows
   } catch (error) {
     console.log(error)
@@ -572,9 +574,9 @@ function randomActivities(activities =[]) {
   }
 }
 
-async function getAktivitas() {
+async function getAktivitas(username) {
   try {
-    const { rows } = await db.query(`SELECT activity_name FROM activities`);
+    const { rows } = await db.query(`SELECT activity_name FROM activities a inner join config_activity ca on a.activity_id = ca.activity_id where ca.username = '${username}'`);
     return rows.map(row => row.activity_name)
   } catch (error) {
     console.log(error) 
