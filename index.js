@@ -26,8 +26,8 @@ app.listen(3000, () => {
     await db.initialize();
     cron.schedule("0 1 * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
-      const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
-      await new Promise(res => setTimeout(res, delay))
+      // const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
+      // await new Promise(res => setTimeout(res, delay))
       await absen('masuk');
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
@@ -40,7 +40,7 @@ app.listen(3000, () => {
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
     cron.schedule("* * * * *", async () => {
-      // await absen('keluar');
+      // await absen('masuk');
       console.log("[INFO] - Log Process", new Date().toLocaleString()); 
     });
   }main();
