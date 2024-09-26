@@ -110,7 +110,7 @@ async function absenMasuk(username, password, location, latar, delayPlusMinute =
   // })
 }
 
-async function absenPulang(username, password, activity, location, latar, delayPlusMinute = 0) {
+async function absenPulang(username, password, activity = "-", location, latar, delayPlusMinute = 0) {
   // return new Promise(async (resolve, reject) => {
     try {
       const minute = delayPlusMinute/1000/60; 

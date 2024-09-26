@@ -32,7 +32,7 @@ app.listen(3000, () => {
       console.log("[INFO] - Finish Procces", new Date().toLocaleString());
     });
   
-    cron.schedule("30 11 * * *", async () => {
+    cron.schedule("30 12 * * *", async () => {
       console.log("[INFO] - Start Procces", new Date().toLocaleString());
       // const delay = ((Math.round(Math.random() * 30) + 2) * 60 * 1000)
       // await new Promise(res => setTimeout(res, delay))
