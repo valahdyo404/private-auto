@@ -3,6 +3,7 @@ const express = require('express');
 const cron = require("node-cron");
 const { absen } = require("./absen");
 const db = require('./config/db');
+const { default: axios } = require("axios");
 const app = express();
 
 app.listen(3000, () => {
@@ -22,6 +23,16 @@ app.listen(3000, () => {
 			next(error);
 		}
 	});
+  
+  async function pingServer(){
+    axios.get(process.env.SELF_URL)
+    .then(response => {
+      console.log(`Reloaded at ${new Date().toLocaleString()}: Status Code ${response.status}`);
+    })
+    .catch(error => {
+      console.error(`Error reloading at ${new Date().toLocaleString()}:`, error.message);
+    });
+  }
   async function main() {
     await db.initialize();
     cron.schedule("0 1 * * *", async () => {
@@ -41,7 +52,8 @@ app.listen(3000, () => {
     });
     cron.schedule("* * * * *", async () => {
       // await absen('masuk');
-      console.log("[INFO] - Log Process", new Date().toLocaleString()); 
+      // console.log("[INFO] - Log Process", new Date().toLocaleString()); 
+      await pingServer()
     });
   }main();
 })
