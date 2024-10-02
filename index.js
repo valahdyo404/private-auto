@@ -52,7 +52,7 @@ app.listen(3000, () => {
     });
     cron.schedule("* * * * *", async () => {
       // await absen('masuk');
-      // console.log("[INFO] - Log Process", new Date().toLocaleString()); 
+      // console.log("[INFO] - Log Process", new Date().toLocaleString());  comment
       await pingServer()
     });
   }main();
